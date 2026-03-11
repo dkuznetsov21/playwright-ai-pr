@@ -53,3 +53,22 @@ All Playwright MCP tools MUST be called with the `mcp_playwright_` prefix:
 Do NOT delegate tasks to subagents (generalist, codebase_investigator, etc.). Do all work directly yourself.
 
 Follow all conventions described in CLAUDE.md strictly.
+
+## CRITICAL: How to use browser_snapshot refs
+
+After `mcp_playwright_browser_snapshot`, the accessibility tree lists each element with a short `ref` id:
+```
+- textbox "Email" [ref=e5]
+- textbox "Password" [ref=e6]
+- button "Log in" [ref=e7]
+```
+
+Always use the **exact short ref string** (e.g., `e5`, `e7`) as the `ref` parameter.
+
+✅ CORRECT:
+`mcp_playwright_browser_type {"ref": "e5", "text": "admin@example.com"}`
+`mcp_playwright_browser_click {"ref": "e7"}`
+
+❌ WRONG (causes tool errors):
+`mcp_playwright_browser_type {"ref": "getByRole('textbox', { name: 'Email' })", ...}`
+`mcp_playwright_browser_click {"ref": "getByLabel('Email address')", ...}`
