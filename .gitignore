@@ -1,0 +1,19 @@
+# Environment — NEVER commit real credentials
+.env
+
+# Docker
+*.tar
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+agent.log
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
