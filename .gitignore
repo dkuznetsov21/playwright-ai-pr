@@ -17,3 +17,11 @@ agent.log
 .idea/
 *.swp
 *.swo
+# Node
+node_modules/
+npm-debug.log*
+package-lock.json
+
+# Playwright
+test-results/
+playwright-report/

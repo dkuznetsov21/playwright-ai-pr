@@ -34,8 +34,9 @@ Once all tests pass, run these exact commands:
 # 1. Create and switch to a feature branch (if not already on one)
 git checkout -b feature/auto-${TESTRAIL_CASE_ID}
 
-# 2. Stage and commit the new test file
-git add .
+# 2. Stage all changes EXCEPT node_modules, logs, and generated artifacts
+git add --all
+git reset HEAD node_modules/ test-results/ playwright-report/ *.log
 git commit -m "test: auto-generated test for case ${TESTRAIL_CASE_ID}"
 
 # 3. Push the branch to GitHub
