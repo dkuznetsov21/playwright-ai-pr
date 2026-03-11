@@ -18,6 +18,12 @@ echo "=========================================="
 : "${TESTRAIL_API_KEY:?TESTRAIL_API_KEY is required}"
 : "${TESTRAIL_PROJECT_ID:?TESTRAIL_PROJECT_ID is required}"
 
+# Strip optional 'C' prefix — TestRail MCP API expects numeric ID
+TESTRAIL_CASE_ID="${TESTRAIL_CASE_ID#C}"
+
+# Strip trailing slash — @bun913/mcp-testrail requires URL without trailing slash
+TESTRAIL_URL="${TESTRAIL_URL%/}"
+
 # 1. Generate ~/.gemini/settings.json from template
 echo ""
 echo "[1/6] Generating Gemini MCP config..."
