@@ -4,18 +4,15 @@ pipeline {
     parameters {
         string(
             name: 'TESTRAIL_CASE_ID',
-            defaultValue: '',
             description: 'TestRail case ID, e.g. C738972'
         )
         string(
             name: 'GITHUB_REPO',
-            defaultValue: 'dkuznetsov21/playwright-example',
             description: 'Target GitHub repository (org/repo)'
         )
         choice(
             name: 'GEMINI_MODEL',
             choices: ['gemini-2.5-flash-lite', 'gemini-2.5-flash'],
-            defaultValue: 'gemini-2.5-flash-lite',
             description: 'Gemini model to use'
         )
     }
