@@ -27,6 +27,6 @@ Run `npx playwright test <file> --reporter=json`.
 If tests fail, go back to the browser (Step 3) to re-inspect failing elements, fix, and re-run.
 
 ### Step 6 — Create PR
-Once all tests pass: `git add`, `git commit`, `git push` to the target branch, then `gh pr create`.
+Once all tests pass, create and push pull request to the GitHub.
 
 Follow all conventions described in CLAUDE.md strictly.
