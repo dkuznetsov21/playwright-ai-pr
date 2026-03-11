@@ -1,70 +1,70 @@
 # Architecture Decisions
 
-## Docker остаётся на Jenkins (не нативный запуск)
+## Docker Runs on Jenkins (not native execution)
 
-**Решение:** Jenkins запускает `docker build` + `docker run`, а не устанавливает зависимости нативно.
+**Decision:** Jenkins runs `docker build` + `docker run` rather than installing dependencies natively.
 
-**Причины:**
-- Playwright требует специфические версии браузеров — MS Playwright Docker image (`mcr.microsoft.com/playwright`) решает это из коробки
-- Изоляция — каждый Jenkins job получает чистый контейнер без артефактов от предыдущих запусков
-- Воспроизводимость — одинаковое поведение локально (`docker-compose`) и на CI (`docker run`)
-- Не нужно устанавливать Node.js, Playwright, браузеры, gh CLI на Jenkins агенте
+**Reasons:**
+- Playwright requires specific browser versions — MS Playwright Docker image (`mcr.microsoft.com/playwright`) handles this out of the box
+- Isolation — each Jenkins job gets a clean container with no artifacts from previous runs
+- Reproducibility — identical behavior locally (`docker-compose`) and on CI (`docker run`)
+- No need to install Node.js, Playwright, browsers, or gh CLI on the Jenkins agent
 
-**Компромисс:** первая сборка медленная (~5-10 мин), но кэш слоёв ускоряет повторные.
-
----
-
-## docker-compose только для локальной разработки
-
-**Решение:** CI использует `docker build` + `docker run` напрямую, без docker-compose.
-
-**Причины:**
-- docker-compose может отсутствовать на Jenkins агенте
-- `docker run --rm` проще для CI: нет необходимости в `docker-compose down`
-- Явные `-e` флаги видны в логах Jenkins (без .env файла)
+**Trade-off:** First build is slow (~5-10 min), but layer cache speeds up subsequent builds.
 
 ---
 
-## Gemini CLI с флагом --yolo
+## docker-compose for Local Development Only
 
-**Решение:** `gemini --yolo` отключает интерактивные подтверждения.
+**Decision:** CI uses `docker build` + `docker run` directly, without docker-compose.
 
-**Причины:**
-- В Docker контейнере нет интерактивного терминала для подтверждений
-- Агент должен работать автономно без вмешательства оператора
-
-**Риск:** агент может выполнить нежелательные операции. Митигация — ограниченный scope через промпт.
-
----
-
-## Jira убран из pipeline
-
-**Решение:** Только `TESTRAIL_CASE_ID` как входной параметр, без Jira.
-
-**Причины:**
-- Упрощает пайплайн — один параметр вместо двух
-- Исключает зависимость от Jira API и его доступности
-- TestRail является единственным источником истины для тест-кейсов
+**Reasons:**
+- docker-compose may not be available on the Jenkins agent
+- `docker run --rm` is simpler for CI: no need for `docker-compose down`
+- Explicit `-e` flags are visible in Jenkins logs (no .env file required)
 
 ---
 
-## Промпты как файлы в репозитории
+## Gemini CLI with --yolo Flag
 
-**Решение:** `prompts/master.md` и `prompts/task-template.md` копируются в Docker образ.
+**Decision:** `gemini --yolo` disables interactive confirmations.
 
-**Причины:**
-- Версионирование промптов вместе с кодом
-- Легко изменять без пересборки образа (если монтировать как volume локально)
-- `envsubst` обеспечивает подстановку переменных окружения в шаблоны
+**Reasons:**
+- There is no interactive terminal inside the Docker container for confirmations
+- The agent must operate autonomously without operator intervention
+
+**Risk:** The agent may perform unintended operations. Mitigation — scope is limited via the prompt.
 
 ---
 
-## MCP серверы: testrail + playwright
+## Jira Removed from Pipeline
 
-**Решение:** два MCP сервера вместо прямых API вызовов.
+**Decision:** Only `TESTRAIL_CASE_ID` as input parameter, without Jira.
 
-**Причины:**
-- Gemini CLI нативно поддерживает MCP протокол
-- Playwright MCP даёт агенту реальный браузер для исследования UI
-- TestRail MCP скрывает детали HTTP авторизации от агента
-- Агент использует высокоуровневые инструменты (browser_snapshot, getCase) вместо сырых HTTP запросов
+**Reasons:**
+- Simplifies the pipeline — one parameter instead of two
+- Removes dependency on Jira API and its availability
+- TestRail is the single source of truth for test cases
+
+---
+
+## Prompts as Files in the Repository
+
+**Decision:** `prompts/master.md` and `prompts/task-template.md` are copied into the Docker image.
+
+**Reasons:**
+- Prompts are versioned alongside the code
+- Easy to modify without rebuilding the image (if mounted as a volume locally)
+- `envsubst` handles environment variable substitution in templates
+
+---
+
+## MCP Servers: testrail + playwright
+
+**Decision:** Two MCP servers instead of direct API calls.
+
+**Reasons:**
+- Gemini CLI natively supports the MCP protocol
+- Playwright MCP gives the agent a real browser to inspect the UI
+- TestRail MCP hides HTTP authentication details from the agent
+- Agent uses high-level tools (browser_snapshot, getCase) instead of raw HTTP requests

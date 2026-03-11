@@ -2,8 +2,8 @@
 
 ## Overview
 
-Gemini QA Agent — Docker-контейнер, который автоматически генерирует Playwright-тесты
-по заданию из TestRail и открывает Pull Request в GitHub.
+Gemini QA Agent — a Docker container that automatically generates Playwright tests
+based on a task from TestRail and opens a Pull Request in GitHub.
 
 ## Components
 
@@ -34,37 +34,37 @@ Gemini QA Agent — Docker-контейнер, который автоматич
 
 ## Data Flow
 
-1. Jenkins передаёт `TESTRAIL_CASE_ID` как параметр
-2. `entrypoint.sh` клонирует target GitHub репо
-3. `envsubst` подставляет переменные в `.gemini.settings.json` и промпт
-4. `gemini` CLI запускает агента с двумя MCP серверами (testrail, playwright)
-5. Агент читает TestRail case → исследует app браузером → пишет тест → создаёт PR
+1. Jenkins passes `TESTRAIL_CASE_ID` as a parameter
+2. `entrypoint.sh` clones the target GitHub repository
+3. `envsubst` substitutes variables in `.gemini.settings.json` and the prompt
+4. `gemini` CLI launches the agent with two MCP servers (testrail, playwright)
+5. Agent reads the TestRail case → inspects app with browser → writes test → creates PR
 
 ## Key Files
 
-| Файл | Назначение |
-|------|-----------|
-| `Dockerfile` | Базовый образ MS Playwright + установка gemini CLI + gh CLI |
-| `entrypoint.sh` | Оркестратор: git clone, envsubst, запуск gemini |
-| `.gemini.settings.json.template` | MCP серверы (testrail, playwright) |
-| `prompts/master.md` | Системный промпт агента (workflow, правила) |
-| `prompts/task-template.md` | Шаблон задачи с переменными TESTRAIL_* |
-| `Jenkinsfile` | CI пайплайн: Validate → Build → Run |
-| `docker-compose.yml` | Локальный запуск для разработки |
+| File | Purpose |
+|------|---------|
+| `Dockerfile` | MS Playwright base image + Gemini CLI + gh CLI installation |
+| `entrypoint.sh` | Orchestrator: git clone, envsubst, run gemini |
+| `.gemini.settings.json.template` | MCP servers (testrail, playwright) |
+| `prompts/master.md` | Agent system prompt (workflow, rules) |
+| `prompts/task-template.md` | Task template with TESTRAIL_* variables |
+| `Jenkinsfile` | CI pipeline: Validate → Build → Run |
+| `docker-compose.yml` | Local development run |
 
 ## Environment Variables
 
-### Через Jenkins Credentials
+### Via Jenkins Credentials
 - `GEMINI_API_KEY` — Google Gemini API key
 - `GITHUB_TOKEN` / `GH_TOKEN` — GitHub PAT (scopes: repo, workflow)
 - `TESTRAIL_API_KEY` — TestRail API key
 
-### Через Jenkins Global Properties
+### Via Jenkins Global Properties
 - `TESTRAIL_URL` — https://blackrockng.testrail.io/
 - `TESTRAIL_USERNAME` — qa@protonixltd.com
 - `TESTRAIL_PROJECT_ID` — 3
 
-### Через Jenkins Build Parameters
+### Via Jenkins Build Parameters
 - `TESTRAIL_CASE_ID` — e.g. C738972
 - `GITHUB_REPO` — e.g. dkuznetsov21/playwright-example
 - `GEMINI_MODEL` — gemini-2.5-flash | gemini-2.5-pro

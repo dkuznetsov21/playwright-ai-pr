@@ -2,85 +2,85 @@
 
 ## MCP Tool Call Prefix
 
-**Проблема:** Gemini агент вызывает MCP инструменты без префикса (например, `getCase` вместо `testrail__getCase`).
+**Problem:** Gemini agent calls MCP tools without the prefix (e.g. `getCase` instead of `testrail__getCase`).
 
-**Решение:** В `prompts/master.md` явно указать правило:
+**Solution:** Explicitly add the rule in `prompts/master.md`:
 ```
 All TestRail MCP tools MUST be called with the `testrail__` prefix
 All Playwright MCP tools MUST be called with the `playwright__` prefix
 ```
 
-**Симптом в логах:** `Tool not found: getCase` или агент не может выполнить запрос к TestRail.
+**Symptom in logs:** `Tool not found: getCase` or the agent cannot complete requests to TestRail.
 
 ---
 
 ## Gemini API Quota Exceeded
 
-**Проблема:** `429 Resource Exhausted` — превышена квота Gemini API.
+**Problem:** `429 Resource Exhausted` — Gemini API quota exceeded.
 
-**Решение:**
-1. Переключиться на `gemini-2.5-flash` (дешевле) вместо `gemini-2.5-pro`
-2. Проверить квоты в Google AI Studio
-3. Включить биллинг на Google Cloud проекте для более высоких лимитов
+**Solution:**
+1. Switch to `gemini-2.5-flash` (cheaper) instead of `gemini-2.5-pro`
+2. Check quotas in Google AI Studio
+3. Enable billing on the Google Cloud project for higher limits
 
-**Симптом:** агент останавливается на середине выполнения с ошибкой 429.
+**Symptom:** Agent stops mid-execution with a 429 error.
 
 ---
 
 ## Docker shm_size
 
-**Проблема:** Playwright падает с ошибкой `shared memory` при работе с Chromium.
+**Problem:** Playwright crashes with a `shared memory` error when running Chromium.
 
-**Решение:** Установить `--shm-size=2gb` в `docker run` (или `shm_size: '2gb'` в docker-compose).
+**Solution:** Set `--shm-size=2gb` in `docker run` (or `shm_size: '2gb'` in docker-compose).
 
-**Симптом:** `Error: Failed to launch the browser process` или `SIGBUS` в логах Chromium.
+**Symptom:** `Error: Failed to launch the browser process` or `SIGBUS` in Chromium logs.
 
 ---
 
 ## GitHub Token Permissions
 
-**Проблема:** `gh pr create` завершается с `GraphQL error: Resource not accessible`.
+**Problem:** `gh pr create` fails with `GraphQL error: Resource not accessible`.
 
-**Решение:** GitHub PAT должен иметь scopes: `repo` + `workflow`.
+**Solution:** GitHub PAT must have scopes: `repo` + `workflow`.
 
-**Симптом:** `gh auth status` показывает отсутствующие scopes.
-
----
-
-## TestRail MCP — неверный URL формат
-
-**Проблема:** `@bun913/mcp-testrail` требует URL без trailing slash.
-
-**Решение:** `TESTRAIL_URL=https://blackrockng.testrail.io` (без `/` в конце).
-
-**Симптом:** ошибки 404 при запросах к TestRail API.
+**Symptom:** `gh auth status` shows missing scopes.
 
 ---
 
-## Gemini --loop флаг
+## TestRail MCP — Invalid URL Format
 
-**Проблема:** Без `--loop` агент может остановиться после одного round-trip инструментов.
+**Problem:** `@bun913/mcp-testrail` requires URL without trailing slash.
 
-**Решение:** Использовать `gemini --loop` или `gemini --yolo` для автономной работы.
+**Solution:** `TESTRAIL_URL=https://blackrockng.testrail.io` (no trailing `/`).
 
-**Симптом:** агент делает один вызов MCP и завершается, не дописав тест.
-
----
-
-## npm ci failed — нет package-lock.json
-
-**Проблема:** `npm ci` падает если в target репозитории нет `package-lock.json`.
-
-**Решение:** Добавить `package-lock.json` в корень target репо, или заменить `npm ci` на `npm install` в entrypoint.
-
-**Симптом:** `npm error The `npm ci` command can only install with an existing package-lock.json`.
+**Symptom:** 404 errors when making requests to the TestRail API.
 
 ---
 
-## Docker Build кэш на Jenkins
+## Gemini --loop Flag
 
-**Проблема:** Jenkins агент не имеет кэша Docker слоёв между сборками — каждая сборка с нуля.
+**Problem:** Without `--loop`, the agent may stop after a single tool round-trip.
 
-**Решение:** Использовать `--cache-from` или настроить Docker registry для хранения промежуточных образов.
+**Solution:** Use `gemini --loop` or `gemini --yolo` for autonomous operation.
 
-**Альтернатива:** Запускать Docker с bind mount для node_modules кэша.
+**Symptom:** Agent makes one MCP call and exits without finishing the test.
+
+---
+
+## npm ci failed — No package-lock.json
+
+**Problem:** `npm ci` fails if the target repository has no `package-lock.json`.
+
+**Solution:** Add `package-lock.json` to the root of the target repo, or replace `npm ci` with `npm install` in the entrypoint.
+
+**Symptom:** `npm error The \`npm ci\` command can only install with an existing package-lock.json`.
+
+---
+
+## Docker Build Cache on Jenkins
+
+**Problem:** Jenkins agent has no Docker layer cache between builds — every build starts from scratch.
+
+**Solution:** Use `--cache-from` or configure a Docker registry to store intermediate images.
+
+**Alternative:** Run Docker with a bind mount for the node_modules cache.
