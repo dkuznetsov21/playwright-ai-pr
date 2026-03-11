@@ -18,9 +18,12 @@ pipeline {
     }
 
     environment {
-        GEMINI_API_KEY   = credentials('gemini-api-key')
-        GITHUB_TOKEN     = credentials('github-token')
-        TESTRAIL_API_KEY = credentials('testrail-api-key')
+        GEMINI_API_KEY       = credentials('gemini-api-key')
+        GITHUB_TOKEN         = credentials('github-token')
+        TESTRAIL_API_KEY     = credentials('testrail-api-key')
+        TESTRAIL_URL         = credentials('TESTRAIL_URL')
+        TESTRAIL_USERNAME    = credentials('TESTRAIL_USERNAME')
+        TESTRAIL_PROJECT_ID  = credentials('TESTRAIL_PROJECT_ID')
     }
 
     stages {
