@@ -1,0 +1,16 @@
+# Git
+.git
+.gitignore
+
+# Secrets
+.env
+
+# Docs
+README.md
+memory/
+
+# Logs
+*.log
+
+# OS
+.DS_Store

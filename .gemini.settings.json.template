@@ -1,0 +1,17 @@
+{
+  "mcpServers": {
+    "testrail": {
+      "command": "npx",
+      "args": ["-y", "@bun913/mcp-testrail@latest"],
+      "env": {
+        "TESTRAIL_URL": "${TESTRAIL_URL}",
+        "TESTRAIL_USERNAME": "${TESTRAIL_USERNAME}",
+        "TESTRAIL_API_KEY": "${TESTRAIL_API_KEY}"
+      }
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp@latest", "--browser", "chromium", "--headless"]
+    }
+  }
+}
